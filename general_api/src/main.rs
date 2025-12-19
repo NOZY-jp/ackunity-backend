@@ -17,15 +17,10 @@ async fn main() {
         .await
         .expect("DB接続に失敗しました");
 
-    sqlx::query("CREATE TABLE IF NOT EXISTS messages (id SERIAL PRIMARY KEY, text TEXT NOT NULL)")
-        .execute(&pool)
+    sqlx::migrate!("./migrations")
+        .run(&pool)
         .await
-        .unwrap();
-
-    sqlx::query("INSERT INTO messages (text) SELECT 'Hello from PostgreSQLLLLLLLLLL!' WHERE NOT EXISTS (SELECT 1 FROM messages)")
-        .execute(&pool)
-        .await
-        .unwrap();
+        .expect("マイグレーションに失敗しました");
 
     // 1. ルート（パス）の設定
     let app = Router::new()
